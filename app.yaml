@@ -1,0 +1,16 @@
+application: mappal
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+- url: /(.+\.html)
+  static_files: static/\1
+  upload: static/(.+\.html)
+
+- url: /stylesheets
+  static_dir: stylesheets
+
+- url: /.*
+  script: location.py
+

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Map Pal</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <link href="/stylesheets/default.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=true"></script>
+    <script type="text/javascript">
+      var name = getParameterByName('name');
+      var id = getParameterByName('id');
+      var map;
+      function initialize() {
+        var myOptions = {
+          zoom: 13,
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        map = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
+
+        var displayPosition = function(pos, errorFlag) {
+          if (pos) {
+            var infowindow = new google.maps.InfoWindow({
+              map: map,
+              position: pos,
+              content: 'Location found!'
+            });
+            map.setCenter(pos);
+
+            $.ajax({
+              type: 'GET',
+              url: '/loc',
+              data: { name: name, id: id, lat: pos.lat(), lon: pos.lng() },
+              dataType: 'jsonp',
+              complete: function() {
+                $(function() {
+                  setTimeout(function() {
+                    getMyPosition(displayPosition);
+                  }, 5000);
+                });
+              },
+              success: function(data, status) {
+                console.log('success: ' + data['id'] + ' ' + data['name'] + ' ' + data['now']);
+              },
+              error: function(jqXHR, status) {
+                console.log('error: ' + status);
+              }
+            });
+          } else {
+            handleNoGeolocation(errorFlag);
+          }
+        };
+        getMyPosition(displayPosition);
+      }
+
+      function getMyPosition(callback) {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+            callback(pos, true);
+          }, function() {
+            callback(null, true);
+          });
+        } else {
+          // Browser doesn't support Geolocation
+          callback(null, false);
+        }
+      }
+
+      function handleNoGeolocation(errorFlag) {
+        if (errorFlag) {
+          var content = 'Error: The Geolocation service failed.';
+        } else {
+          var content = 'Error: Your browser doesn\'t support geolocation.';
+        }
+
+        var options = {
+          map: map,
+          position: new google.maps.LatLng(35.65668, 139.696299),
+          content: content
+        };
+
+        var infowindow = new google.maps.InfoWindow(options);
+        map.setCenter(options.position);
+      }
+
+      function getParameterByName(name) {
+        name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
+        var results = regex.exec(window.location.search);
+        if (results == null) {
+          return "";
+        } else {
+          return decodeURIComponent(results[1].replace(/\+/g, " "));
+        }
+      }
+
+      google.maps.event.addDomListener(window, 'load', initialize);
+
+    </script>
+  </head>
+  <body>
+    <div id="map_canvas"></div>
+  </body>
+</html>
