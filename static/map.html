@@ -11,6 +11,8 @@
       var name = getParameterByName('name');
       var id = getParameterByName('id');
       var map;
+      var marker_list = new google.maps.MVCArray();
+
       function initialize() {
         var myOptions = {
           zoom: 13,
@@ -20,11 +22,16 @@
 
         var displayPosition = function(pos, errorFlag) {
           if (pos) {
-            var infowindow = new google.maps.InfoWindow({
+            marker_list.forEach(function(marker, index) {
+              marker.setMap(null);
+            });
+
+            var marker = new google.maps.Marker({
               map: map,
               position: pos,
-              content: 'Location found!'
+              title: name
             });
+            marker_list.push(marker);
             map.setCenter(pos);
 
             $.ajax({
@@ -46,8 +53,10 @@
                 console.log('error: ' + status);
               }
             });
+            return pos;
           } else {
             handleNoGeolocation(errorFlag);
+            return null;
           }
         };
         getMyPosition(displayPosition);
