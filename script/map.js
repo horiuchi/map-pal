@@ -29,17 +29,23 @@ function initialize() {
       $.ajax({
         type: 'GET',
         url: '/loc',
-        data: { name: name, id: id, lat: pos.lat(), lon: pos.lng() },
+        data: { name: name, id: id, lat: pos.lat(), lng: pos.lng() },
         dataType: 'jsonp',
         complete: function() {
           $(function() {
             setTimeout(function() {
-            getMyPosition(displayPosition);
+              getMyPosition(displayPosition);
             }, 5000);
           });
         },
         success: function(data, status) {
-          console.log('success: ' + data['id'] + ' ' + data['name'] + ' ' + data['now']);
+          for (var user in data) {
+            var detail = data[user];
+            console.log(' ' + user + ' ' + detail['now'] + ' ' + detail['lat'] + ' ' + detail['lng']);
+            if (name != user) {
+              console.log('  different name.');
+            }
+          }
         },
         error: function(jqXHR, status) {
           console.log('error: ' + status);
