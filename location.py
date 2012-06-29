@@ -10,6 +10,8 @@ locations = {}
 
 
 class JSONPHandler(webapp.RequestHandler):
+    DATE_FORMAT = '%Y/%m/%d %H:%M:%S'
+
     def get(self):
         id = self._update_location(self.request)
         json = simplejson.dumps(self._display_location(id))
@@ -23,7 +25,18 @@ class JSONPHandler(webapp.RequestHandler):
         self.response.out.write(json)
 
     def _display_location(self, id):
+        self._delete_old_data(id)
         return locations.setdefault(id, {})
+
+    def _delete_old_data(self, id):
+        if not id in locations:
+            return
+        names = locations[id]
+        for name, value in names.iteritems():
+            time = datetime.datetime.strptime(value['now'], self.DATE_FORMAT)
+            now = datetime.datetime.utcnow()
+            if time < now - datetime.timedelta(minutes=5):
+                del names[name]
 
     def _update_location(self, req):
         id = req.get('id')
@@ -35,7 +48,7 @@ class JSONPHandler(webapp.RequestHandler):
             del value['first']
         else:
             value['first'] = True
-        value['now'] = str(datetime.datetime.utcnow())
+        value['now'] = datetime.datetime.utcnow().strftime(self.DATE_FORMAT)
         value['lat'] = req.get('lat')
         value['lng'] = req.get('lng')
 
