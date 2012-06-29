@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-import simplejson
 import datetime
+import json
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
@@ -14,15 +14,15 @@ class JSONPHandler(webapp.RequestHandler):
 
     def get(self):
         id = self._update_location(self.request)
-        json = simplejson.dumps(self._display_location(id))
+        jsdata = json.dumps(self._display_location(id))
 
         callback = self.request.get('callback')
         if callback:
-            json = '%s(%s)' % (callback, json)
+            jsdata = '%s(%s)' % (callback, jsdata)
 
         self.response.headers['Content-Type'] =\
                 'application/javascript; charset=utf-8'
-        self.response.out.write(json)
+        self.response.out.write(jsdata)
 
     def _display_location(self, id):
         self._delete_old_data(id)
