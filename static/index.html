@@ -2,7 +2,22 @@
 <html>
   <head>
     <title>Map Pal - Start Page.</title>
+    <script type="text/javascript" src="/script/global.js"></script>
   </head>
   <body>
+    <form action="map.html">
+      <table>
+        <tr><td>id:</td><td><input type="text" id="id" name="id" value=""></td></tr>
+        <tr><td>name:</td><td><input type="text" id="name" name="name" value=""></td></tr>
+      </table>
+      <input type="submit" name="submit">
+    </form>
+    <script  type="text/javascript">
+    <!--
+      var value = getParameterByName('id');
+      var elem = window.document.getElementById('id');
+      elem.value = value;
+    -->
+    </script>
   </body>
 </html>
