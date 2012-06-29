@@ -39,7 +39,7 @@ class JSONPHandler(webapp.RequestHandler):
                 del names[name]
 
     def _check_old_time(self, now, old):
-        return time < now - datetime.timedelta(hours=2)
+        return old < now - datetime.timedelta(hours=2)
 
     def _update_location(self, req):
         id = req.get('id')

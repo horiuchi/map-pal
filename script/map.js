@@ -4,6 +4,8 @@ var name = getParameterByName('name');
 var id = getParameterByName('id');
 var map;
 var marker_list = new google.maps.MVCArray();
+var pinImages = {};
+
 
 function initialize() {
   var myOptions = {
@@ -18,12 +20,7 @@ function initialize() {
         marker.setMap(null);
       });
 
-      var marker = new google.maps.Marker({
-        map: map,
-        position: pos,
-        title: name
-      });
-      marker_list.push(marker);
+      //addMapMarker(pos, name, null);
       map.setCenter(pos);
 
       $.ajax({
@@ -33,6 +30,7 @@ function initialize() {
         dataType: 'jsonp',
         complete: function() {
           $(function() {
+            addMapMarker(pos, name, null);
             setTimeout(function() {
               getMyPosition(displayPosition);
             }, 5000);
@@ -43,7 +41,8 @@ function initialize() {
             var detail = data[user];
             console.log(' ' + user + ' ' + detail['now'] + ' ' + detail['lat'] + ' ' + detail['lng']);
             if (name != user) {
-              console.log('  different name.');
+              var pos = new google.maps.LatLng(detail['lat'], detail['lng']);
+              addMapMarker(pos, user, "0000FF");
             }
           }
         },
@@ -58,6 +57,50 @@ function initialize() {
     }
   };
   getMyPosition(displayPosition);
+}
+
+function addMapMarker(pos, name, color) {
+  var marker = new google.maps.Marker({
+    map: map,
+    position: pos,
+    title: name
+  });
+  if (color != null) {
+    var images = createPinImage(color);
+    if (images) {
+      marker.setIcon(images['icon']);
+      marker.setShadow(images['shadow']);
+    }
+  }
+  if (name) {
+    var info = new google.maps.InfoWindow({
+      content: name
+    });
+    google.maps.event.addListener(marker, 'click', function() {
+      info.open(marker.get('map'), marker);
+    });
+  }
+  marker_list.push(marker);
+}
+
+function createPinImage(color) {
+  var images = pinImages[color];
+  if (images) return images;
+
+  images = {
+    icon : new google.maps.MarkerImage(
+      "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + color,
+      new google.maps.Size(21, 34),
+      new google.maps.Point(0, 0),
+      new google.maps.Point(10, 34)),
+    shadow : new google.maps.MarkerImage(
+      "http://chart.apis.google.com/chart?chst=d_map_pin_shadow",
+      new google.maps.Size(40, 37),
+      new google.maps.Point(0, 0),
+      new google.maps.Point(12, 35))
+  };
+  pinImages[color] = images;
+  return images;
 }
 
 function getMyPosition(callback) {
