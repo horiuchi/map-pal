@@ -35,8 +35,11 @@ class JSONPHandler(webapp.RequestHandler):
         for name, value in names.iteritems():
             time = datetime.datetime.strptime(value['now'], self.DATE_FORMAT)
             now = datetime.datetime.utcnow()
-            if time < now - datetime.timedelta(minutes=5):
+            if self._check_old_time(now, time):
                 del names[name]
+
+    def _check_old_time(self, now, old):
+        return time < now - datetime.timedelta(hours=2)
 
     def _update_location(self, req):
         id = req.get('id')
