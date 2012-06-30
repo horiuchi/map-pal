@@ -22,6 +22,7 @@ function initialize() {
 
       //addMapMarker(pos, name, null);
       map.setCenter(pos);
+      var bound = new google.maps.LatLngBounds(pos, pos);
 
       $.ajax({
         type: 'GET',
@@ -31,9 +32,15 @@ function initialize() {
         complete: function() {
           $(function() {
             addMapMarker(pos, name, null);
+            var zoom = map.getZoom();
+            map.fitBounds(bound);
+            if (map.getZoom() > zoom) {
+              map.setZoom(zoom);
+            }
+
             setTimeout(function() {
               getMyPosition(displayPosition);
-            }, 5000);
+            }, 10000);
           });
         },
         success: function(data, status) {
@@ -41,8 +48,9 @@ function initialize() {
             var detail = data[user];
             console.log(' ' + user + ' ' + detail['now'] + ' ' + detail['lat'] + ' ' + detail['lng']);
             if (name != user) {
-              var pos = new google.maps.LatLng(detail['lat'], detail['lng']);
-              addMapMarker(pos, user, "0000FF");
+              var p = new google.maps.LatLng(detail['lat'], detail['lng']);
+              addMapMarker(p, user, "0000FF");
+              bound.extend(p);
             }
           }
         },
@@ -50,10 +58,8 @@ function initialize() {
           console.log('error: ' + status);
         }
       });
-      return pos;
     } else {
       handleNoGeolocation(errorFlag);
-      return null;
     }
   };
   getMyPosition(displayPosition);
