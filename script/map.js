@@ -1,8 +1,7 @@
-(function(){
-
 var name = getParameterByName('name');
 var id = getParameterByName('id');
 var map;
+var interval = 30;
 var marker_list = new google.maps.MVCArray();
 var pinImages = {};
 
@@ -40,7 +39,7 @@ function initialize() {
 
             setTimeout(function() {
               getMyPosition(displayPosition);
-            }, 10000);
+            }, interval * 1000);
           });
         },
         success: function(data, status) {
@@ -141,5 +140,3 @@ function handleNoGeolocation(errorFlag) {
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);
-
-})();

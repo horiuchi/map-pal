@@ -3,5 +3,19 @@ html, body, #map_canvas {
     margin: 0;
     padding: 0;
     height: 100%;
+    width: 100%;
 }
 
+#map_canvas {
+  position: absolute;
+}
+
+#config {
+  position: absolute;
+  top: 10;
+  left: 10%;
+  background: #fff;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-radius: 5px;
+}
